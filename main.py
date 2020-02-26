@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.scrolledtext as tkst
 import portscanner as ps
+import json
 
 class BoardScanner:
 
@@ -54,7 +55,7 @@ class BoardScanner:
         ports.grid(row=3, column=1, sticky='ew')
         ## Escrita
         exemplo_port = tk.StringVar()
-        exemplo_port.set('0-100')#('0-65535')
+        exemplo_port.set('0-65535')
         self.entrada_portas = tk.Entry(self.window, textvariable = exemplo_port)
         self.entrada_portas.grid(row=3, column=2, sticky="ew")
 
@@ -74,10 +75,18 @@ class BoardScanner:
 
         self.ps = ps.PortScanner()
 
+        self.servico = {}
+        with open("portas_servicos.json") as json_file:
+            data = json.load(json_file)
+            for p in data:
+                self.servico[p] = data[p]
+
     def iniciar(self):
         self.window.mainloop()
 
     def scaner_host(self, event):
+        self.resposta.delete(1.0,tk.END)
+        #Prepara as informacoes para escanear as portas
         lista_portas = self.entrada_portas.get().split('-')
         if len(lista_portas) == 1 and lista_portas[0]=='':
             portasRange = [0,365535]
@@ -87,19 +96,30 @@ class BoardScanner:
             portasRange = [int(lista_portas[0]),int(lista_portas[1])]
 
         tcp_list, udp_list = self.ps.scanPorts(self.entrada_rede.get(),portasRange,self.tcp_value.get(),self.udp_value.get())
-        resposta_text = ''
+        # resposta_text = ''
+        #Lista as portas TCP
         if (self.tcp_value.get() == 1):
-            resposta_text += 'TCP:\n'
+            # resposta_text += 'TCP:\n'
+            self.resposta.insert('insert', 'TCP:\n')
             for i in tcp_list:
-                resposta_text += '{0}/TCP open\n'.format(i)
+                porta_servico = ''
+                if str(i[0])+'/tcp' in self.servico and i[1]!='closed':
+                    porta_servico = self.servico[str(i[0])+'/tcp']
+                # resposta_text += '{0}/TCP {1} {2}\n'.format(i[0], i[1],porta_servico)
+                self.resposta.insert('insert', '{0}/TCP {1} {2}\n'.format(i[0], i[1],porta_servico))
 
+        #Lista as portas UDP
         if (self.udp_value.get() == 1):
-            resposta_text += 'UDP:\n'
+            # resposta_text += 'UDP:\n'
+            self.resposta.insert('insert', '\nUDP:\n')
             for i in udp_list:
-                resposta_text += '{0}/UDP open\n'.format(i)
-
-        self.resposta.delete(1.0,tk.END)
-        self.resposta.insert('insert', resposta_text)
+                porta_servico = ''
+                if str(i[0])+'/udp' in self.servico and i[1]!='closed':
+                    porta_servico = self.servico[str(i[0])+'/udp']
+                # resposta_text += '{0}/UDP {1} {2}\n'.format(i[0],i[1],porta_servico)
+                self.resposta.insert('insert', '{0}/UDP {1} {2}\n'.format(i[0],i[1],porta_servico))
+                
+        # self.resposta.insert('insert', resposta_text)
 
     # def scaner_network(self, event):
     #     print("Entrou aqui no NETWORK")
