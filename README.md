@@ -10,6 +10,6 @@ Para executar o escaneador de portas, é necessário ter:
 
 Quando tiver todos os requisitos, basta executar no terminal dentro do diretório do projeto o comando abaixo:
 
-'''
+```
 python3 main.py
-'''
+```
