@@ -35,7 +35,7 @@ class BoardScanner:
         rede.grid(row=1, column=1, sticky='ew')
         ## Escrita
         exemplo_rede = tk.StringVar()
-        exemplo_rede.set('192.168.1.93')
+        exemplo_rede.set('192.168.50.93')
         self.entrada_rede = tk.Entry(self.window, textvariable = exemplo_rede)
         self.entrada_rede.grid(row=1, column=2, sticky="ew")
 
@@ -61,12 +61,12 @@ class BoardScanner:
 
         #Botoes
         self.scanhost = tk.Button(self.window, text="Escanear host")
-        self.scanhost.grid(row=4,column=1, sticky='nsew', columnspan=2)
+        self.scanhost.grid(row=4,column=1, sticky='nsew', columnspan=1)
         self.scanhost.bind('<1>',self.scaner_host)
 
-        # self.scannet = tk.Button(self.window, text="Escanear rede")
-        # self.scannet.grid(row=4,column=2, sticky='nsew')
-        # self.scannet.bind('<1>',self.scaner_network)
+        self.scannet = tk.Button(self.window, text="Escanear rede")
+        self.scannet.grid(row=4,column=2, sticky='nsew')
+        self.scannet.bind('<1>',self.scaner_network)
 
         #Saida
         self.resposta = tkst.ScrolledText(self.window, wrap='word')
@@ -102,29 +102,21 @@ class BoardScanner:
             # resposta_text += 'TCP:\n'
             self.resposta.insert('insert', 'TCP:\n')
             for i in tcp_list:
-                porta_servico = ''
-                if str(i[0])+'/tcp' in self.servico and i[1]!='closed':
-                    porta_servico = self.servico[str(i[0])+'/tcp']
-                # resposta_text += '{0}/TCP {1} {2}\n'.format(i[0], i[1],porta_servico)
-                self.resposta.insert('insert', '{0}/TCP {1} {2}\n'.format(i[0], i[1],porta_servico))
+                self.resposta.insert('insert', '{0}/TCP open {1}\n'.format(i[0], i[1]))
 
         #Lista as portas UDP
         if (self.udp_value.get() == 1):
-            # resposta_text += 'UDP:\n'
             self.resposta.insert('insert', '\nUDP:\n')
             for i in udp_list:
-                porta_servico = ''
-                if str(i[0])+'/udp' in self.servico and i[1]!='closed':
-                    porta_servico = self.servico[str(i[0])+'/udp']
-                # resposta_text += '{0}/UDP {1} {2}\n'.format(i[0],i[1],porta_servico)
-                self.resposta.insert('insert', '{0}/UDP {1} {2}\n'.format(i[0],i[1],porta_servico))
-                
-        # self.resposta.insert('insert', resposta_text)
+                self.resposta.insert('insert', '{0}/UDP {1}\n'.format(i[0],i[1]))
 
-    # def scaner_network(self, event):
-    #     print("Entrou aqui no NETWORK")
-    #     print(self.entrada_rede.get())
-        
+    def scaner_network(self, event):
+        self.resposta.delete(1.0,tk.END)
+        rede = self.ps.scanNet(self.entrada_rede.get())
+        self.resposta.insert('insert', 'IP       ----------       MAC\n')
+
+        for maquina in rede:
+            self.resposta.insert('insert', '{0}  ----  {1}\n'.format(maquina['ip'],maquina['mac']))
 
 scanner = BoardScanner()
 scanner.iniciar()

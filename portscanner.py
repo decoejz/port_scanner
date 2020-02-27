@@ -40,10 +40,25 @@ class PortScanner:
                 try:
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     s.connect((ip,i))
-                    tcp_status.append((i,'open'))
+                    
+                    s.send(b'----\r\n')
+                    resposta = s.recv(100)
                     s.close()
+                    tcp_status.append((i,str(resposta)[2:-1]))
                 except:
-                    tcp_status.append((i,'closed'))
+                    pass
             if (udp == 1):
                 udp_status.append((i,self.udp_scan(ip,i,10)))
         return(tcp_status,udp_status)
+
+    def scanNet(self,ip):
+        arp = ARP(pdst=ip)
+        ether = Ether(dst="ff:ff:ff:ff:ff:ff")
+        pacote = ether/arp
+        results = srp(pacote,timeout=3,verbose=0)[0]
+
+        clientes = []
+        for sent, received in results:
+            clientes.append({'ip':received.psrc, 'mac':received.hwsrc})
+        
+        return clientes
