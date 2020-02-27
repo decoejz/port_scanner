@@ -1,5 +1,3 @@
-# Codigo construido informacoes do livro Violent Python, capitulo 2
-# Autor: TJ O'Connor
 import socket
 from scapy.all import *
 
@@ -36,6 +34,8 @@ class PortScanner:
         pacote = b'----\r\n'
 
         for i in range(portRange[0],portRange[1]+1):
+            # Codigo construido informacoes do livro Violent Python, capitulo 2
+            # Autor: TJ O'Connor
             if (tcp == 1):
                 try:
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,6 +51,8 @@ class PortScanner:
                 udp_status.append((i,self.udp_scan(ip,i,10)))
         return(tcp_status,udp_status)
 
+    # Codigo retirado de:
+    # https://www.thepythoncode.com/article/building-network-scanner-using-scapy
     def scanNet(self,ip):
         arp = ARP(pdst=ip)
         ether = Ether(dst="ff:ff:ff:ff:ff:ff")
