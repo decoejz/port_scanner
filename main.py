@@ -113,7 +113,7 @@ class BoardScanner:
     def scaner_network(self, event):
         self.resposta.delete(1.0,tk.END)
         rede = self.ps.scanNet(self.entrada_rede.get())
-        self.resposta.insert('insert', 'IP       ----------       MAC\n')
+        self.resposta.insert('insert', 'IP         ----------         MAC\n')
 
         for maquina in rede:
             self.resposta.insert('insert', '{0}  ----  {1}\n'.format(maquina['ip'],maquina['mac']))
