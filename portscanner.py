@@ -28,27 +28,29 @@ class PortScanner:
         else:
             return 'CHECK'
 
+    # Codigo construido com informacoes do livro Violent Python, capitulo 2
+    # Autor: TJ O'Connor
+    def tcp_scan(self,ip,porta):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((ip,porta))
+            s.close()
+            print("Porta conectada: ",porta)
+            return True
+        except:
+            return False
+
     def scanPorts(self,ip,portRange,tcp,udp):
         tcp_status = []
         udp_status = []
-        pacote = b'----\r\n'
 
         for i in range(portRange[0],portRange[1]+1):
-            # Codigo construido informacoes do livro Violent Python, capitulo 2
-            # Autor: TJ O'Connor
             if (tcp == 1):
-                try:
-                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.connect((ip,i))
-                    
-                    s.send(b'----\r\n')
-                    resposta = s.recv(100)
-                    s.close()
-                    tcp_status.append((i,str(resposta)[2:-1]))
-                except:
-                    pass
+                if (self.tcp_scan(ip,i)):
+                    tcp_status.append(i)
             if (udp == 1):
                 udp_status.append((i,self.udp_scan(ip,i,10)))
+
         return(tcp_status,udp_status)
 
     # Codigo retirado de:

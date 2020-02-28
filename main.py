@@ -58,6 +58,7 @@ class BoardScanner:
         exemplo_port.set('0-65535')
         self.entrada_portas = tk.Entry(self.window, textvariable = exemplo_port)
         self.entrada_portas.grid(row=3, column=2, sticky="ew")
+        self.entrada_portas.bind('<Return>',self.scaner_host)
 
         #Botoes
         self.scanhost = tk.Button(self.window, text="Escanear host")
@@ -96,13 +97,15 @@ class BoardScanner:
             portasRange = [int(lista_portas[0]),int(lista_portas[1])]
 
         tcp_list, udp_list = self.ps.scanPorts(self.entrada_rede.get(),portasRange,self.tcp_value.get(),self.udp_value.get())
-        # resposta_text = ''
+        
         #Lista as portas TCP
         if (self.tcp_value.get() == 1):
-            # resposta_text += 'TCP:\n'
             self.resposta.insert('insert', 'TCP:\n')
             for i in tcp_list:
-                self.resposta.insert('insert', '{0}/TCP open {1}\n'.format(i[0], i[1]))
+                try:
+                    self.resposta.insert('insert', '{0}/TCP open {1}\n'.format(i,self.servico[str(i)+'/tcp']))
+                except:
+                    self.resposta.insert('insert', '{0}/TCP open {1}\n'.format(i,'desconhecido'))
 
         #Lista as portas UDP
         if (self.udp_value.get() == 1):
